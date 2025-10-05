@@ -9,10 +9,12 @@ Original file is located at
 
 import pandas as pd
 import numpy as np
-from math import radians, cos, sin, asin, sqrt
+from math import radians, cos, sin, asin, sqrt, hypot
 
 from datetime import datetime, timedelta
 from sklearn.linear_model import LinearRegression
+
+import os
 
 def train_and_predict_future(df, year, month):
     """
@@ -72,7 +74,7 @@ def load_merged_exports(paths):
 
         # Parse date: your sample is like "1/1/23"
         # If you ever change to ISO (YYYY-MM-01), this still works.
-        df['date'] = pd.to_datetime(df['date'], errors='raise', infer_datetime_format=True)
+        df['date'] = pd.to_datetime(df['date'], errors='raise')
 
         # Coerce numerics just in case CSV has stray strings
         for col in ['T2M_C','QV2M_gkg','U2M','V2M','PRECTOT_mm','longitude','latitude']:
@@ -141,20 +143,6 @@ def predict_from_csvs(user_lat, user_lon, target_date, csv_paths):
         "df_used": df_feat      # optional: features your model trained on
     }
 
-result = predict_from_csvs(
-    user_lat=40.7484,
-    user_lon=-73.9857,
-    target_date=datetime(2026, 7, 1),
-    csv_paths=["merra2_na_2023.csv", "merra2_na_2024.csv"]
-)
-
-preds = dict(result["predictions"])
-if "PRECTOT_mm" in preds:
-    preds["PRECTOT_mm_daily"] = round(preds["PRECTOT_mm"] / 30.0, 2)
-
-# overwrite (optional; or just print preds)
-result["predictions"] = preds
-
 ## Health Risk ##
 def _bin_temp(temp_c: float) -> int:
     # 0=Low, 1=Medium, 2=High
@@ -186,11 +174,7 @@ def health_risk_minbin(temp_c: float, qv_gkg: float) -> str:
     risk_bin = min(t_bin, q_bin)
     return ["Low", "Medium", "High"][risk_bin]
 
-if "T2M_C" in preds and "QV2M_gkg" in preds:
-    preds["Health_Risk"] = health_risk_minbin(preds["T2M_C"], preds["QV2M_gkg"])
-## Chance of being swept away ##
-import math
-
+# Chance of being swept away ##
 def swept_away_risk(u_ms: float, v_ms: float) -> str:
     """
     Compute 'Chance of Being Swept Away' category from U/V wind components (m/s).
@@ -201,7 +185,7 @@ def swept_away_risk(u_ms: float, v_ms: float) -> str:
       - High   : total ≥ 40 m/s
     """
     # Compute total wind speed magnitude
-    ws = math.hypot(u_ms, v_ms)  # sqrt(U^2 + V^2)
+    ws = hypot(u_ms, v_ms)  # sqrt(U^2 + V^2)
 
     if ws >= 40:
         return "High"
@@ -210,10 +194,33 @@ def swept_away_risk(u_ms: float, v_ms: float) -> str:
     else:
         return "Low"
 
-# Add Chance of Being Swept Away
-if "U2M" in preds and "V2M" in preds:
-    preds["Swept_Away_Risk"] = swept_away_risk(preds["U2M"], preds["V2M"])
+def main(lat, lng, date):
+    script_dir = os.path.dirname(os.path.abspath(__file__))
 
+    result = predict_from_csvs(
+        user_lat=lat,
+        user_lon=lng,
+        target_date=datetime.fromisoformat(date.replace("Z", "+00:00")),
+        csv_paths=[os.path.join(script_dir, "merra2_na_2023.csv"), os.path.join(script_dir, "merra2_na_2024.csv")]
+    )
 
-print(result["nearest_cell"])
-print(preds)
+    preds = dict(result["predictions"])
+    if "PRECTOT_mm" in preds:
+        preds["PRECTOT_mm_daily"] = round(preds["PRECTOT_mm"] / 30.0, 2)
+
+    # overwrite (optional; or just print preds)
+    result["predictions"] = preds
+
+    if "T2M_C" in preds and "QV2M_gkg" in preds:
+        preds["Health_Risk"] = health_risk_minbin(preds["T2M_C"], preds["QV2M_gkg"])
+
+    # Add Chance of Being Swept Away
+    if "U2M" in preds and "V2M" in preds:
+        preds["Swept_Away_Risk"] = swept_away_risk(preds["U2M"], preds["V2M"])
+
+    # print(result["nearest_cell"])
+    # print(preds)
+    return preds
+
+if __name__ == "__main__":
+    main()
