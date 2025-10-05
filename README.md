@@ -1,36 +1,14 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Bear-ing the Storm
+We access low resolution (50x50km) data from the NASA MERRA-2 hourly reanalysis dataset for all of North America (roughly -170º to -50º longitude and 15º to 75º latitude) and then compress this data temporally to download monthly temperature average (at 2m in the atmosphere column), monthly precipitation average, eastward wind (2m), and northward wind (2m) data from 2023-01-01 to 2025-01-01. We chose this model over higher spatial resolution (1x1km) models (e.g., Daymet) to increase computational efficiency. On the backend, we download this large dataset using the Google Earth Engine API, and then use the 2 years of data to create a linear regression predictor model at each gridpoint. To access the data, the user puts a pin in the map and then we access the model predictor from the nearest grid cell from that pin to provide the predicted data.
 
-## Getting Started
+We predict 6 categories of weather information. The categories of information include: “Average Daily Temperature (ºC)” “Average Daily Precipitation (mm)” “Average Daily Wind Strength” (m/s for both eastward, u and northward, v directions)” “Average Daily Specific Humidity (g/kg)” “Chances of Getting Swept Away: Low, Medium, High” (if wind speed in any direction is greater than 20 m/s or 40 m/s, respectively), and “Health Risk: Low, Medium, High” (categories based on combination of temperature and specific humidity, where low = <21ºC and <7 g/kg, medium = 32ºC<x>21ºC, 10<x>7 g/kg, and high = >32º and >10 g/kg). 
 
-First, run the development server:
+Currently, one limitation to this model is that by using a monthly dataset, we can only predict variables into the future monthly rather than daily. The next iteration of this work would use daily datasets and calculate predictions into the future daily. Additional next steps for this project include calculating extreme rain and extreme heat variables using local topography and geology information (e.g., flooding risk is higher in more arid landscapes and so higher rainfall may cause flash flooding). 
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Another challenge that we encountered throughout this process was trying to use cloud weather data (aka. Google Earth Engine satellite data) to calculate predictions. Analysis using Google Earth Engine (GEE) data requires mounting a GEE project that is stored on a local account. However, this means that we are unable to deploy the analysis on a public web application, and hence the final solution of uploading a local file that includes all prediction models using MERRA data. We tried to explore ways to overcome this challenge. 
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The cloud data we used for this test was NASA GLDAS2.1 3-hourly dataset which includes  precipitation, temperature, and humidity data. Due to time constraints we only tested with temperature data.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+To access GLDAS data without using a local project, we first created a service account under a GEE project. We are then able to create a public key, which can be read by applications. By doing this we can retrieve GEE data and do the calculations on a server instead of on a local GEE project. We created a python web application using Flask that can read the service account credentials, retrieve GEE data using the service account, and create regression models to output a predicted temperature at a given time and place. 
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The final result is a backend system that does all the data retrieval and prediction at once: by inputting the coordinates and a date (Year and month), it outputs the predicted future temperature of that date. Because there is no need to download large amounts of data, this system can predict the temperature of any location. Hence, we don’t have to restrict our extent to North America. If we wanted our app to predict weather data of any location, we can potentially apply this method. 
