@@ -36,7 +36,7 @@ const Dashboard = () => {
         </div>
 
         <div style={{ flex: "1 1 240px", minWidth: "200px", background: "#f3f4f6", border: "1px solid #d1d5db", borderRadius: "8px", padding: "18px", boxShadow: "0 4px 10px rgba(0,0,0,0.03)" }}>
-          <h1>Wind</h1>
+          <h1>Messed Up Hair</h1>
           <p>Content</p>
         </div>
       </div>
