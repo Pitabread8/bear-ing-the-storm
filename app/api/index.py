@@ -9,7 +9,7 @@ def hello_world():
     return "Hello, World!"
 
 @app.route('/api/save', methods=['POST'])
-def save_coords():
+def save_data():
     data = request.get_json()
     return jsonify({'status': 'ok', 'data': data})
 
