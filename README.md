@@ -1,4 +1,9 @@
 # Bear-ing the Storm
+
+## Setup
+After cloning and installing neccesary packages, run `npm run dev` and `python api/index.py` simultaneously, then open [http://localhost:3000](http://localhost:3000) with your browser to see the result. Remember to update `.env` with the correct localhost url.
+
+## About
 We access low resolution (50x50km) data from the NASA MERRA-2 hourly reanalysis dataset for all of North America (roughly -170º to -50º longitude and 15º to 75º latitude) and then compress this data temporally to download monthly temperature average (at 2m in the atmosphere column), monthly precipitation average, eastward wind (2m), and northward wind (2m) data from 2023-01-01 to 2025-01-01. We chose this model over higher spatial resolution (1x1km) models (e.g., Daymet) to increase computational efficiency. On the backend, we download this large dataset using the Google Earth Engine API, and then use the 2 years of data to create a linear regression predictor model at each gridpoint. To access the data, the user puts a pin in the map and then we access the model predictor from the nearest grid cell from that pin to provide the predicted data.
 
 We predict 6 categories of weather information. The categories of information include: “Average Daily Temperature (ºC)” “Average Daily Precipitation (mm)” “Average Daily Wind Strength” (m/s for both eastward, u and northward, v directions)” “Average Daily Specific Humidity (g/kg)” “Chances of Getting Swept Away: Low, Medium, High” (if wind speed in any direction is greater than 20 m/s or 40 m/s, respectively), and “Health Risk: Low, Medium, High” (categories based on combination of temperature and specific humidity, where low = <21ºC and <7 g/kg, medium = 32ºC<x>21ºC, 10<x>7 g/kg, and high = >32º and >10 g/kg). 
