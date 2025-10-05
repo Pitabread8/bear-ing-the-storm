@@ -3,7 +3,7 @@ from flask_cors import CORS
 import sys
 import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'predictive-model')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'app', 'predictive-model')))
 from model_prediction import main
 
 app = Flask(__name__)
