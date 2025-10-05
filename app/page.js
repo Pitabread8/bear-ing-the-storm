@@ -42,7 +42,7 @@ export default function Home() {
 
   return (
     <main>
-      <div className="flex flex-row gap-6 p-4 h-screen">
+      <div className="flex flex-row gap-24 p-8 h-screen">
         <Map sendCoords={handleCoords} />
         <div className="flex flex-col items-center justify-center gap-12 grow">
           <div className="flex flex-row gap-2">
@@ -57,14 +57,14 @@ export default function Home() {
           {lat != null && lng != null && date != null ? (
             <button
               onClick={submitData}
-              className="w-full px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center hover:bg-[#8ba08d] hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-1/3 px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center hover:bg-[#8ba08d] hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit!
             </button>
           ) : (
             <button
               disabled
-              className="w-full px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-1/3 px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Submit!
             </button>

@@ -22,7 +22,16 @@ export default function Map({ sendCoords }) {
   useEffect(() => {
     if (leafletMapRef.current) return;
 
-    const map = L.map(mapRef.current).setView([39.5, -98.35], 4);
+    const map = L.map(mapRef.current, {
+      zoom: 3,
+      minZoom: 3,
+      maxBounds: [
+        [15, -170],
+        [75, -50],
+      ],
+      maxBoundsViscosity: 1.0,
+    }).setView([40, -100]);
+
     leafletMapRef.current = map;
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -42,5 +51,5 @@ export default function Map({ sendCoords }) {
     });
   }, []);
 
-  return <div ref={mapRef} style={{ height: "100%", width: "75vw" }} className="rounded-xl" />;
+  return <div ref={mapRef} style={{ height: "100%", width: "45vw" }} className="rounded-xl" />;
 }
