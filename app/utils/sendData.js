@@ -9,6 +9,7 @@ const sendData = async (value) => {
     });
 
     const data = await res.json();
+    console.log(data)
     return data;
   } catch (err) {
     console.error("Error sending to Flask:", err);

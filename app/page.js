@@ -51,6 +51,7 @@ export default function Home() {
       <div className="flex flex-row gap-24 p-8 h-screen">
         <Map sendCoords={handleCoords} />
         <div className="flex flex-col items-center justify-center gap-12 grow">
+          <h1 className="text-6xl text-[#577885]">Bear-ing the Storm</h1>
           <div className="flex flex-row gap-2">
             <HiArrowLeft className="w-7 h-7" />
             <p>Click on the map to select your event location.</p>
@@ -61,12 +62,15 @@ export default function Home() {
           </div>
           <Calendar sendDate={handleDate} />
           {lat != null && lng != null && date != null ? (
-            <button
-              onClick={submitData}
-              className="w-1/3 px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center hover:bg-[#8ba08d] hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Submit!
-            </button>
+            <>
+              <button
+                onClick={submitData}
+                className="w-1/3 px-5 py-3 bg-[#cfddd0] text-black rounded-lg text-lg font-medium text-center hover:bg-[#8ba08d] hover:scale-105 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Submit!
+              </button>
+              <p className="text-xl">Scroll down for the results!</p>
+            </>
           ) : (
             <button
               disabled

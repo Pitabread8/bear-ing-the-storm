@@ -104,7 +104,7 @@ export default function Calendar({ sendDate }) {
   };
 
   return (
-    <div className="calendar-container bg-[#484747] rounded-lg shadow-lg text-white select-none">
+    <div className="calendar-container bg-[#4d7987] rounded-lg shadow-lg text-white select-none">
       <header className="flex items-center justify-between px-5 pt-4 pb-2">
         <p className="font-medium text-lg">
           {months[month]} {year}
