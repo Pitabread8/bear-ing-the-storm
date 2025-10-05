@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "api/**/*.py": {
+      "excludeFiles": "public/**, .next/**, node_modules/**, .venv/**, __pycache__/**, **/*.pyc, **/*.json, **/*.txt"
+    }
+  }
+}
