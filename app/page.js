@@ -16,6 +16,7 @@ export default function Home() {
   const [lat, setLat] = useState(null);
   const [lng, setLng] = useState(null);
   const [date, setDate] = useState(null);
+  const [predictionData, setPredictionData] = useState(null);
 
   const handleCoords = (coordsValue) => {
     if (coordsValue != null) {
@@ -30,13 +31,18 @@ export default function Home() {
     }
   };
 
-  const submitData = () => {
+  const submitData = async () => {
     if (lat === null || lng === null) {
       alert("Please select a location on the map first!");
     } else if (date === null) {
       alert("Please select a day on the calendar first!");
     } else {
-      sendData([lat, lng, date]);
+      try {
+        const data = await sendData([lat, lng, date]);
+        setPredictionData(data);
+      } catch (err) {
+        console.error("Failed to send data:", err);
+      }
     }
   };
 
@@ -72,7 +78,7 @@ export default function Home() {
         </div>
       </div>
       {/* <DataFetcher path="test" /> */}
-      <Dashboard />
+      {predictionData && <Dashboard data={predictionData} />}
     </main>
   );
 }
