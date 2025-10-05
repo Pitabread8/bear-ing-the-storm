@@ -1,4 +1,4 @@
-from flask import Flask, requests, jsonify
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -9,12 +9,9 @@ def hello_world():
     return "Hello, World!"
 
 @app.route('/api/save', methods=['POST'])
-def save_message():
-    data = requests.get_json()
+def save_coords():
+    data = request.get_json()
     return jsonify({'status': 'ok', 'data': data})
-
-if __name__ == '__main__':
-    app.run(port=5328)
 
 if __name__ == '__main__':
     app.run(port=5328)

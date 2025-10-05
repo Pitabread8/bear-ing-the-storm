@@ -5,7 +5,7 @@ const sendData = async (value) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: value }),
+      body: JSON.stringify({ coords: value }),
     });
 
     const data = await res.json();
