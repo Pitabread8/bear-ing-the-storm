@@ -4,11 +4,10 @@ import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function Map({ onSend }) {
+export default function Map({ sendCoords }) {
   const mapRef = useRef(null);
   const leafletMapRef = useRef(null);
   const markerRef = useRef(null);
-  const [coords, setCoords] = useState(null);
 
   const customIcon = new L.Icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -38,17 +37,10 @@ export default function Map({ onSend }) {
       }
 
       const newMarker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
-      setCoords([lat, lng]);
+      sendCoords([lat, lng]);
       markerRef.current = newMarker;
     });
   }, []);
 
-  return (
-    <>
-      <div style={{ height: "500px", width: "100%" }}>
-        <div ref={mapRef} style={{ height: "100%" }} />
-      </div>
-      <button onClick={() => onSend(coords)}>Get my results!</button>
-    </>
-  );
+  return <div ref={mapRef} style={{ height: "100%", width: "75vw" }} className="rounded-xl" />;
 }
