@@ -155,6 +155,65 @@ if "PRECTOT_mm" in preds:
 # overwrite (optional; or just print preds)
 result["predictions"] = preds
 
-print(result["nearest_cell"])
-print(result["predictions"])
+## Health Risk ##
+def _bin_temp(temp_c: float) -> int:
+    # 0=Low, 1=Medium, 2=High
+    if temp_c < 21:
+        return 0
+    elif temp_c <= 32:
+        return 1
+    else:
+        return 2
 
+def _bin_qv(qv_gkg: float) -> int:
+    # 0=Low, 1=Medium, 2=High
+    if qv_gkg < 7:
+        return 0
+    elif qv_gkg <= 10:
+        return 1
+    else:
+        return 2
+
+def health_risk_minbin(temp_c: float, qv_gkg: float) -> str:
+    """
+    Overall risk is the MIN of the two bins (Low<Med<High).
+    - If either is Low → Low
+    - If one is High and the other Medium → Medium
+    - Only High when both are High
+    """
+    t_bin = _bin_temp(temp_c)
+    q_bin = _bin_qv(qv_gkg)
+    risk_bin = min(t_bin, q_bin)
+    return ["Low", "Medium", "High"][risk_bin]
+
+if "T2M_C" in preds and "QV2M_gkg" in preds:
+    preds["Health_Risk"] = health_risk_minbin(preds["T2M_C"], preds["QV2M_gkg"])
+## Chance of being swept away ##
+import math
+
+def swept_away_risk(u_ms: float, v_ms: float) -> str:
+    """
+    Compute 'Chance of Being Swept Away' category from U/V wind components (m/s).
+
+    Returns: 'Low', 'Medium', or 'High'
+      - Low    : total wind speed < 20 m/s
+      - Medium : 20 ≤ total < 40 m/s
+      - High   : total ≥ 40 m/s
+    """
+    # Compute total wind speed magnitude
+    ws = math.hypot(u_ms, v_ms)  # sqrt(U^2 + V^2)
+
+    if ws >= 40:
+        return "High"
+    elif ws >= 20:
+        return "Medium"
+    else:
+        return "Low"
+
+# Add Chance of Being Swept Away
+if "U2M" in preds and "V2M" in preds:
+    preds["Swept_Away_Risk"] = swept_away_risk(preds["U2M"], preds["V2M"])
+
+
+print(result["nearest_cell"])
+print(preds)
