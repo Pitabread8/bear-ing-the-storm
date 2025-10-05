@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-export default function LeafletMarkerOnly() {
+export default function Map({ onSend }) {
   const mapRef = useRef(null);
   const leafletMapRef = useRef(null);
   const markerRef = useRef(null);
+  const [coords, setCoords] = useState(null);
 
   const customIcon = new L.Icon({
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
@@ -37,13 +38,17 @@ export default function LeafletMarkerOnly() {
       }
 
       const newMarker = L.marker([lat, lng], { icon: customIcon }).addTo(map);
+      setCoords([lat, lng]);
       markerRef.current = newMarker;
     });
   }, []);
 
   return (
-    <div style={{ height: "500px", width: "100%" }}>
-      <div ref={mapRef} style={{ height: "100%" }} />
-    </div>
+    <>
+      <div style={{ height: "500px", width: "100%" }}>
+        <div ref={mapRef} style={{ height: "100%" }} />
+      </div>
+      <button onClick={() => onSend(coords)}>Get my results!</button>
+    </>
   );
 }
