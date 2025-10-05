@@ -145,8 +145,16 @@ result = predict_from_csvs(
     user_lat=40.7484,
     user_lon=-73.9857,
     target_date=datetime(2026, 7, 1),
-    csv_paths=["exports/merra2_na_2023.csv", "exports/merra2_na_2024.csv"]
+    csv_paths=["merra2_na_2023.csv", "merra2_na_2024.csv"]
 )
+
+preds = dict(result["predictions"])
+if "PRECTOT_mm" in preds:
+    preds["PRECTOT_mm_daily"] = round(preds["PRECTOT_mm"] / 30.0, 2)
+
+# overwrite (optional; or just print preds)
+result["predictions"] = preds
+
 print(result["nearest_cell"])
 print(result["predictions"])
 
